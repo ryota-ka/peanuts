@@ -29,10 +29,15 @@ data Expr model a where
     TruthValueType :: Bool -> Expr model Bool
     CompositeType  :: (a -> b) -> Expr model (a -> b)
 
+    FunctionalApplication_l2r :: Expr model (a -> b) -> Expr model a -> Expr model b
+    FunctionalApplication_r2l :: Expr model a -> Expr model (a -> b) -> Expr model b
+
 eval :: Expr model a -> a
 eval (EntityType e) = e
 eval (TruthValueType t) = t
 eval (CompositeType f) = f
+eval (FunctionalApplication_l2r l r) = (eval l) (eval r)
+eval (FunctionalApplication_r2l l r) = (eval r) (eval l)
 
 boy :: Expr Peanuts (Peanuts -> Bool)
 boy = CompositeType $ \case
