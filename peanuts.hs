@@ -137,3 +137,46 @@ the = CompositeType $ \predicate ->
 
 (&.) :: Expr model a -> Expr model (a -> b) -> Expr model b
 (&.) = FunctionalApplication_r2l
+
+main :: IO ()
+main = do
+    let entities :: [Peanuts]
+        entities = [minBound .. maxBound]
+
+    putStrLn "Linus is a boy"
+    print . eval $
+        linusE &. boy -- True
+
+    putStrLn "Sally is a boy"
+    print . eval $
+        sallyE &. boy -- False
+
+    putStrLn "Schroeder is crazy"
+    print . eval $
+        schroederE &. crazy -- False
+
+    putStrLn "All boys are players"
+    let boys = filter (eval boy) entities
+    print $
+        all (eval player) boys -- True
+
+    putStrLn "All girls are players"
+    let girls = filter (eval girl) entities
+    print $
+        all (eval player) girls -- False
+
+    putStrLn "Some girls are players"
+    print $
+        any (eval player) girls -- True
+
+    putStrLn "The counselor is a girl"
+    print . eval $
+        (the $. counselor) &. girl -- True
+
+    putStrLn "Girls are cute"
+    print $
+        filter (eval girl) entities == filter (eval cute) entities
+
+    putStrLn "Lucy loves Charlie"
+    print . eval $
+        lucyE &. (love $. charlieE) -- False
