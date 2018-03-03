@@ -13,12 +13,12 @@ data Peanuts
     | Schroeder
     deriving (Eq, Show)
 
-data Expr a where
-    EntityType     :: Peanuts -> Expr Peanuts
-    TruthValueType :: Bool -> Expr Bool
-    CompositeType  :: (a -> b) -> Expr (a -> b)
+data Expr model a where
+    EntityType     :: model -> Expr model model
+    TruthValueType :: Bool -> Expr model Bool
+    CompositeType  :: (a -> b) -> Expr model (a -> b)
 
-eval :: Expr a -> a
+eval :: Expr model a -> a
 eval (EntityType e) = e
 eval (TruthValueType t) = t
 eval (CompositeType f) = f
