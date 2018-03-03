@@ -13,6 +13,16 @@ data Peanuts
     | Schroeder
     deriving (Eq, Show)
 
+snoopyE, woodstockE, charlieE, sallyE, lucyE, linusE, pattyE, schroederE :: Expr Peanuts Peanuts
+snoopyE    = EntityType Snoopy
+woodstockE = EntityType Woodstock
+charlieE   = EntityType Charlie
+sallyE     = EntityType Sally
+lucyE      = EntityType Lucy
+linusE     = EntityType Linus
+pattyE     = EntityType Patty
+schroederE = EntityType Schroeder
+
 data Expr model a where
     EntityType     :: model -> Expr model model
     TruthValueType :: Bool -> Expr model Bool
