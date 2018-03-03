@@ -220,3 +220,9 @@ main = do
     putStrLn "Snoopy is a crazy dog"
     print . eval emptyVarAsgmt $
         snoopyE &. (crazy .&&. dog) -- False
+
+    putStrLn "She(4) loves him(6)"
+    let she = Pronoun 4
+        him = Pronoun 6
+    print . eval peanutsAsgmt $
+        she &. (love $. him) -- True
