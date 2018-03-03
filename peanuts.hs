@@ -82,3 +82,40 @@ counselor :: Expr Peanuts (Peanuts -> Bool)
 counselor = CompositeType $ \case
     Lucy -> True
     _    -> False
+
+like :: Expr Peanuts (Peanuts -> Peanuts -> Bool)
+like = CompositeType $ \object subject -> case (subject, object) of
+    ( Snoopy    , Woodstock ) -> True
+    ( Snoopy    , Charlie   ) -> True
+    ( Charlie   , Snoopy    ) -> True
+    ( Charlie   , Sally     ) -> True
+    ( Charlie   , Schroeder ) -> True
+    ( Woodstock , Snoopy    ) -> True
+    ( Sally     , Lucy      ) -> True
+    ( Lucy      , Sally     ) -> True
+    ( Lucy      , Lucy      ) -> True
+    ( Linus     , Snoopy    ) -> True
+    ( Linus     , Charlie   ) -> True
+    ( Schroeder , Charlie   ) -> True
+    _                         -> False
+
+love :: Expr Peanuts (Peanuts -> Peanuts -> Bool)
+love = CompositeType $ \object subject -> case (subject, object) of
+    ( Lucy  , Schroeder ) -> True
+    ( Sally , Linus     ) -> True
+    ( Patty , Charlie   ) -> True
+    _                     -> False
+
+kiss :: Expr Peanuts (Peanuts -> Peanuts -> Bool)
+kiss = CompositeType $ \object subject -> case (subject, object) of
+    ( Lucy  , Schroeder ) -> True
+    ( Sally , Linus     ) -> True
+    _                     -> False
+
+hit :: Expr Peanuts (Peanuts -> Peanuts -> Bool)
+hit = CompositeType $ \object subject -> case (subject, object) of
+    ( Patty , Charlie ) -> True
+    _                   -> False
+
+kick :: Expr Peanuts (Peanuts -> Peanuts -> Bool)
+kick = CompositeType $ const (const False)
