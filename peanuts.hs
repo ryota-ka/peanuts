@@ -131,3 +131,9 @@ the = CompositeType $ \predicate ->
         case xs of
             [x] -> x
             _   -> error "the given predicate matches more than one entities"
+
+($.) :: Expr model (a -> b) -> Expr model a -> Expr model b
+($.) = FunctionalApplication_l2r
+
+(&.) :: Expr model a -> Expr model (a -> b) -> Expr model b
+(&.) = FunctionalApplication_r2l
