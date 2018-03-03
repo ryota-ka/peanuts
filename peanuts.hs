@@ -24,6 +24,8 @@ linusE     = EntityType Linus
 pattyE     = EntityType Patty
 schroederE = EntityType Schroeder
 
+type Ix = Int
+
 data Expr model a where
     EntityType     :: model -> Expr model model
     TruthValueType :: Bool -> Expr model Bool
@@ -34,13 +36,37 @@ data Expr model a where
 
     PredicateModification :: Expr model (a -> Bool) -> Expr model (a -> Bool) -> Expr model (a -> Bool)
 
-eval :: Expr model a -> a
-eval (EntityType e) = e
-eval (TruthValueType t) = t
-eval (CompositeType f) = f
-eval (FunctionalApplication_l2r l r) = (eval l) (eval r)
-eval (FunctionalApplication_r2l l r) = (eval r) (eval l)
-eval (PredicateModification p q) = \x -> eval p x && eval q x
+    Trace   :: Ix -> Expr model model
+    Pronoun :: Ix -> Expr model model
+
+type VarAsgmt model = Ix -> model
+
+noSuchAssignment :: Ix -> void
+noSuchAssignment ix = error $ "no such assignment: " ++ show ix
+
+emptyVarAsgmt :: VarAsgmt model
+emptyVarAsgmt = noSuchAssignment
+
+peanutsAsgmt :: VarAsgmt Peanuts
+peanutsAsgmt 1 = Snoopy
+peanutsAsgmt 2 = Woodstock
+peanutsAsgmt 3 = Charlie
+peanutsAsgmt 4 = Sally
+peanutsAsgmt 5 = Lucy
+peanutsAsgmt 6 = Linus
+peanutsAsgmt 7 = Patty
+peanutsAsgmt 8 = Schroeder
+peanutsAsgmt i = noSuchAssignment i
+
+eval :: VarAsgmt model -> Expr model a -> a
+eval _ (EntityType e) = e
+eval _ (TruthValueType t) = t
+eval _ (CompositeType f) = f
+eval g (FunctionalApplication_l2r l r) = (eval g l) (eval g r)
+eval g (FunctionalApplication_r2l l r) = (eval g r) (eval g l)
+eval g (PredicateModification p q) = \x -> eval g p x && eval g q x
+eval g (Trace i) = g i
+eval g (Pronoun i) = g i
 
 boy :: Expr Peanuts (Peanuts -> Bool)
 boy = CompositeType $ \case
@@ -150,47 +176,47 @@ main = do
         entities = [minBound .. maxBound]
 
     putStrLn "Linus is a boy"
-    print . eval $
+    print . eval emptyVarAsgmt $
         linusE &. boy -- True
 
     putStrLn "Sally is a boy"
-    print . eval $
+    print . eval emptyVarAsgmt $
         sallyE &. boy -- False
 
     putStrLn "Schroeder is crazy"
-    print . eval $
+    print . eval emptyVarAsgmt $
         schroederE &. crazy -- False
 
     putStrLn "All boys are players"
-    let boys = filter (eval boy) entities
+    let boys = filter (eval emptyVarAsgmt boy) entities
     print $
-        all (eval player) boys -- True
+        all (eval emptyVarAsgmt player) boys -- True
 
     putStrLn "All girls are players"
-    let girls = filter (eval girl) entities
+    let girls = filter (eval emptyVarAsgmt girl) entities
     print $
-        all (eval player) girls -- False
+        all (eval emptyVarAsgmt player) girls -- False
 
     putStrLn "Some girls are players"
     print $
-        any (eval player) girls -- True
+        any (eval emptyVarAsgmt player) girls -- True
 
     putStrLn "The counselor is a girl"
-    print . eval $
+    print . eval emptyVarAsgmt $
         (the $. counselor) &. girl -- True
 
     putStrLn "Girls are cute"
     print $
-        filter (eval girl) entities == filter (eval cute) entities
+        filter (eval emptyVarAsgmt girl) entities == filter (eval emptyVarAsgmt cute) entities
 
     putStrLn "Lucy loves Charlie"
-    print . eval $
+    print . eval emptyVarAsgmt $
         lucyE &. (love $. charlieE) -- False
 
     putStrLn "Sally is a cute girl"
-    print . eval $
+    print . eval emptyVarAsgmt $
         sallyE &. (cute .&&. girl) -- True
 
     putStrLn "Snoopy is a crazy dog"
-    print . eval $
+    print . eval emptyVarAsgmt $
         snoopyE &. (crazy .&&. dog) -- False
