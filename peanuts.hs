@@ -32,12 +32,15 @@ data Expr model a where
     FunctionalApplication_l2r :: Expr model (a -> b) -> Expr model a -> Expr model b
     FunctionalApplication_r2l :: Expr model a -> Expr model (a -> b) -> Expr model b
 
+    PredicateModification :: Expr model (a -> Bool) -> Expr model (a -> Bool) -> Expr model (a -> Bool)
+
 eval :: Expr model a -> a
 eval (EntityType e) = e
 eval (TruthValueType t) = t
 eval (CompositeType f) = f
 eval (FunctionalApplication_l2r l r) = (eval l) (eval r)
 eval (FunctionalApplication_r2l l r) = (eval r) (eval l)
+eval (PredicateModification p q) = \x -> eval p x && eval q x
 
 boy :: Expr Peanuts (Peanuts -> Bool)
 boy = CompositeType $ \case
