@@ -12,7 +12,7 @@ data Peanuts
     | Linus
     | Patty
     | Schroeder
-    deriving (Eq, Show)
+    deriving (Bounded, Enum, Eq, Show)
 
 snoopyE, woodstockE, charlieE, sallyE, lucyE, linusE, pattyE, schroederE :: Expr Peanuts Peanuts
 snoopyE    = EntityType Snoopy
@@ -119,3 +119,10 @@ hit = CompositeType $ \object subject -> case (subject, object) of
 
 kick :: Expr Peanuts (Peanuts -> Peanuts -> Bool)
 kick = CompositeType $ const (const False)
+
+the :: (Bounded model, Enum model) => Expr model ((model -> Bool) -> model)
+the = CompositeType $ \predicate ->
+    let xs = filter predicate [minBound .. maxBound] in
+        case xs of
+            [x] -> x
+            _   -> error "the given predicate matches more than one entities"
