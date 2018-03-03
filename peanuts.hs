@@ -141,6 +141,9 @@ the = CompositeType $ \predicate ->
 (&.) :: Expr model a -> Expr model (a -> b) -> Expr model b
 (&.) = FunctionalApplication_r2l
 
+(.&&.) :: Expr model (a -> Bool) -> Expr model (a -> Bool) -> Expr model (a -> Bool)
+(.&&.) = PredicateModification
+
 main :: IO ()
 main = do
     let entities :: [Peanuts]
