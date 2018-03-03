@@ -186,3 +186,11 @@ main = do
     putStrLn "Lucy loves Charlie"
     print . eval $
         lucyE &. (love $. charlieE) -- False
+
+    putStrLn "Sally is a cute girl"
+    print . eval $
+        sallyE &. (cute .&&. girl) -- True
+
+    putStrLn "Snoopy is a crazy dog"
+    print . eval $
+        snoopyE &. (crazy .&&. dog) -- False
