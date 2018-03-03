@@ -17,3 +17,8 @@ data Expr a where
     EntityType     :: Peanuts -> Expr Peanuts
     TruthValueType :: Bool -> Expr Bool
     CompositeType  :: (a -> b) -> Expr (a -> b)
+
+eval :: Expr a -> a
+eval (EntityType e) = e
+eval (TruthValueType t) = t
+eval (CompositeType f) = f
