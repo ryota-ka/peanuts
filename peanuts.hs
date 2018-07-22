@@ -1,7 +1,12 @@
+#!/usr/bin/env stack
+-- stack --install-ghc runghc --package hspec
+
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
 
 module Peanuts where
+
+import Test.Hspec
 
 data Peanuts
     = Snoopy
@@ -171,58 +176,59 @@ the = CompositeType $ \predicate ->
 (.&&.) = PredicateModification
 
 main :: IO ()
-main = do
+main = hspec $ do
     let entities :: [Peanuts]
         entities = [minBound .. maxBound]
 
-    putStrLn "Linus is a boy"
-    print . eval emptyVarAsgmt $
-        linusE &. boy -- True
+    describe "Linus is a boy" $ do
+        it "is true" $ do
+            eval emptyVarAsgmt (linusE &. boy) `shouldBe` True
 
-    putStrLn "Sally is a boy"
-    print . eval emptyVarAsgmt $
-        sallyE &. boy -- False
+    describe "Sally is a boy" $ do
+        it "is true" $ do
+            eval emptyVarAsgmt (sallyE &. boy) `shouldBe` False
 
-    putStrLn "Schroeder is crazy"
-    print . eval emptyVarAsgmt $
-        schroederE &. crazy -- False
+    describe "Schroeder is crazy" $ do
+        it "is false" $ do
+            eval emptyVarAsgmt (schroederE &. crazy) `shouldBe` False
 
-    putStrLn "All boys are players"
-    let boys = filter (eval emptyVarAsgmt boy) entities
-    print $
-        all (eval emptyVarAsgmt player) boys -- True
+    describe "All boys are players" $ do
+        let boys = filter (eval emptyVarAsgmt boy) entities
+        it "is true" $ do
+            all (eval emptyVarAsgmt player) boys `shouldBe` True
 
-    putStrLn "All girls are players"
-    let girls = filter (eval emptyVarAsgmt girl) entities
-    print $
-        all (eval emptyVarAsgmt player) girls -- False
+    describe "All girls are players" $ do
+        let girls = filter (eval emptyVarAsgmt girl) entities
+        it "is false" $ do
+            all (eval emptyVarAsgmt player) girls `shouldBe` False
 
-    putStrLn "Some girls are players"
-    print $
-        any (eval emptyVarAsgmt player) girls -- True
+    describe "Some girls are players" $ do
+        let girls = filter (eval emptyVarAsgmt girl) entities
+        it "is true" $ do
+            any (eval emptyVarAsgmt player) girls `shouldBe` True
 
-    putStrLn "The counselor is a girl"
-    print . eval emptyVarAsgmt $
-        (the $. counselor) &. girl -- True
+    describe "The counselor is a girl" $ do
+        it "is true" $ do
+            eval emptyVarAsgmt ((the $. counselor) &. girl) `shouldBe` True
 
-    putStrLn "Girls are cute"
-    print $
-        filter (eval emptyVarAsgmt girl) entities == filter (eval emptyVarAsgmt cute) entities
+    describe "Girls are cute" $ do
+        it "is true" $ do
+            filter (eval emptyVarAsgmt girl) entities `shouldBe` filter (eval emptyVarAsgmt cute) entities
 
-    putStrLn "Lucy loves Charlie"
-    print . eval emptyVarAsgmt $
-        lucyE &. (love $. charlieE) -- False
+    describe "Lucy loves Charlie" $ do
+        it "is false" $ do
+            eval emptyVarAsgmt (lucyE &. (love $. charlieE)) `shouldBe` False
 
-    putStrLn "Sally is a cute girl"
-    print . eval emptyVarAsgmt $
-        sallyE &. (cute .&&. girl) -- True
+    describe "Sally is a cute girl" $ do
+        it "is true" $ do
+            eval emptyVarAsgmt (sallyE &. (cute .&&. girl)) `shouldBe` True
 
-    putStrLn "Snoopy is a crazy dog"
-    print . eval emptyVarAsgmt $
-        snoopyE &. (crazy .&&. dog) -- False
+    describe "Snoopy is a crazy dog" $ do
+        it "is false" $ do
+            eval emptyVarAsgmt (snoopyE &. (crazy .&&. dog)) `shouldBe` False
 
-    putStrLn "She(4) loves him(6)"
-    let she = Pronoun 4
-        him = Pronoun 6
-    print . eval peanutsAsgmt $
-        she &. (love $. him) -- True
+    describe "She(4) loves him(6)" $ do
+        let she = Pronoun 4
+            him = Pronoun 6
+        it "is true" $ do
+            eval peanutsAsgmt (she &. (love $. him)) `shouldBe` True
